@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pet Cubé - Juntos en cada paseo | Accesorio 4 en 1 para Mascotas</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        military: {
+                            50: '#f2f5f3',
+                            100: '#e1e8e3',
+                            200: '#c5d3c8',
+                            500: '#58705c',
+                            600: '#354238', // Verde Militar del Logo / Producto
+                            700: '#2a342c',
+                            800: '#212923',
+                            900: '#171d19',
+                        },
+                        camel: {
+                            50: '#fcf8f2',
+                            100: '#f6ebd9',
+                            200: '#edd6b3',
+                            500: '#d4a373',
+                            600: '#c19a6b', // Camel
+                            700: '#a37e51',
+                        },
+                        sand: '#f8f6f0',
+                        cream: '#faf8f5'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts & Font Awesome Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f6f0;
+            color: #2b2b2b;
+        }
+        .font-brand {
+            font-family: 'Fredoka', cursive, sans-serif;
+        }
+        .bg-pattern {
+            background-image: radial-gradient(#354238 0.75px, transparent 0.75px), radial-gradient(#354238 0.75px, #f8f6f0 0.75px);
+            background-size: 28px 28px;
+            background-position: 0 0, 14px 14px;
+            opacity: 0.08;
+        }
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f6ebd9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #354238;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between overflow-x-hidden">
+
+    <!-- OVERLAY / MODALS CONTAINER -->
+    <div id="modal-backdrop" class="fixed inset-0 bg-black/60 z-50 hidden backdrop-blur-sm transition-opacity duration-300"></div>
+
+    <!-- PET PROFILE PREVIEW MODAL -->
+    <div id="profile-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden relative border-4 border-military-600 my-8">
+            <button onclick="closeModal('profile-modal')" class="absolute top-4 right-4 bg-white/90 hover:bg-white text-gray-700 w-10 h-10 rounded-full flex items-center justify-center shadow-md z-10 font-bold text-xl">
+                &times;
+            </button>
+            <div id="profile-modal-content" class="p-6">
+                <!-- Dinámico -->
+            </div>
+        </div>
+    </div>
+
+    <!-- CARRITO DRAWER -->
+    <div id="cart-drawer" class="fixed inset-y-0 right-0 max-w-full flex z-50 transform translate-x-full transition-transform duration-300 ease-in-out">
+        <div class="w-screen max-w-md bg-white shadow-2xl flex flex-col">
+            <div class="p-6 bg-military-600 text-white flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <i class="fa-solid fa-basket-shopping text-xl text-camel-500"></i>
+                    <h3 class="text-xl font-bold font-brand">Tu Carrito Pet Cubé</h3>
+                </div>
+                <button onclick="toggleCart()" class="text-white/80 hover:text-white text-2xl font-bold">&times;</button>
+            </div>
+            
+            <div id="cart-items" class="flex-1 overflow-y-auto p-6 space-y-4 divide-y divide-gray-100">
+                <div class="text-center py-12 text-gray-400">
+                    <i class="fa-solid fa-box-open text-5xl mb-3 text-camel-200"></i>
+                    <p class="text-lg font-medium">Tu carrito está vacío</p>
+                    <p class="text-sm text-gray-400 mt-1">¡Añade tu Pet Cubé 4 en 1 para salir a pasear bien equipado!</p>
+                </div>
+            </div>
+
+            <div class="p-6 bg-sand border-t border-camel-200">
+                <div class="flex justify-between items-center mb-4">
+                    <span class="text-gray-600 font-medium">Total</span>
+                    <span id="cart-total" class="text-2xl font-black text-military-800">$0.00</span>
+                </div>
+                <button onclick="checkoutCart()" class="w-full py-3.5 px-6 bg-military-600 hover:bg-military-700 text-white font-bold rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-bag-shopping"></i>
+                    Proceder a la Compra
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- HEADER / NAVIGATION -->
+    <header class="sticky top-0 z-40 bg-sand/95 backdrop-blur-md border-b border-military-100 transition-all">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                
+                <!-- LOGO OFICIAL PET CUBE CREADO EN SVG FIDEDIGNO A LA IMAGEN -->
+                <a href="#" class="flex items-center gap-3 group">
+                    <div class="w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0 group-hover:scale-105 transition-transform duration-300">
+                        <svg viewBox="0 0 500 500" class="w-full h-full drop-shadow-sm">
+                            <!-- Borde Verde Militar Exterior -->
+                            <circle cx="250" cy="250" r="236" fill="#f8f6f0" stroke="#2e3b2b" stroke-width="22"/>
+                            
+                            <!-- Sombras de apoyo -->
+                            <ellipse cx="250" cy="340" rx="140" ry="12" fill="#e5dfd3"/>
+                            
+                            <!-- CUBÉ VERDE MILITAR -->
+                            <g id="cube">
+                                <!-- Cuerpo Cubo -->
+                                <rect x="225" y="215" width="135" height="110" rx="18" fill="#5b6e56" stroke="#2e3b2b" stroke-width="8"/>
+                                <!-- Tapa frontal / bolsillo -->
+                                <rect x="235" y="235" width="105" height="65" rx="10" fill="#dedbd2" stroke="#2e3b2b" stroke-width="7"/>
+                                <rect x="272" y="280" width="30" height="25" rx="5" fill="#f8f6f0" stroke="#2e3b2b" stroke-width="6"/>
+                                <!-- Correa / Asidero derecho -->
+                                <path d="M 350 225 C 410 240 400 320 345 295" fill="none" stroke="#2e3b2b" stroke-width="12" stroke-linecap="round"/>
+                                <path d="M 350 225 C 410 240 400 320 345 295" fill="none" stroke="#5b6e56" stroke-width="6" stroke-linecap="round"/>
+                                <!-- Ranura superior -->
+                                <rect x="275" y="218" width="35" height="6" rx="3" fill="#2e3b2b"/>
+                            </g>
+
+                            <!-- PERRITO TIENO CON MANCHAS CAMEL -->
+                            <g id="puppy">
+                                <!-- Cola rizada -->
+                                <path d="M 140 250 C 100 240 100 190 125 200 C 140 210 135 240 155 260" fill="#ffffff" stroke="#2e3b2b" stroke-width="8" stroke-linejoin="round"/>
+                                
+                                <!-- Cuerpo posterior / Patas traseras -->
+                                <ellipse cx="190" cy="285" rx="42" ry="38" fill="#ffffff" stroke="#2e3b2b" stroke-width="8"/>
+                                <!-- Mancha Camel en la espalda/cadera -->
+                                <path d="M 160 270 C 150 290 190 315 210 290 C 210 270 180 255 160 270 Z" fill="#b87d4b"/>
+                                <!-- Patita trasera sentada -->
+                                <path d="M 160 310 C 160 325 210 325 220 310 C 220 295 180 290 160 310 Z" fill="#ffffff" stroke="#2e3b2b" stroke-width="7"/>
+
+                                <!-- Cabeza del Perrito -->
+                                <ellipse cx="225" cy="165" rx="65" ry="58" fill="#ffffff" stroke="#2e3b2b" stroke-width="8"/>
+                                
+                                <!-- Mancha Camel en el Ojo Izquierdo -->
+                                <path d="M 180 135 C 165 160 195 195 220 185 C 230 160 210 125 180 135 Z" fill="#b87d4b"/>
+
+                                <!-- Oreja Izquierda (Caída Camel) -->
+                                <path d="M 175 145 C 130 130 110 180 135 205 C 160 220 185 180 175 145 Z" fill="#b87d4b" stroke="#2e3b2b" stroke-width="8" stroke-linejoin="round"/>
+
+                                <!-- Oreja Derecha (Alzada/Levantada Camel) -->
+                                <path d="M 265 130 C 315 80 340 130 320 165 C 300 190 260 150 265 130 Z" fill="#b87d4b" stroke="#2e3b2b" stroke-width="8" stroke-linejoin="round"/>
+
+                                <!-- Cara / Expresión Alegre -->
+                                <!-- Ojitos feliz (Arcos curvos) -->
+                                <path d="M 195 150 Q 207 138 218 152" fill="none" stroke="#2e3b2b" stroke-width="8" stroke-linecap="round"/>
+                                <path d="M 242 148 Q 252 136 262 148" fill="none" stroke="#2e3b2b" stroke-width="8" stroke-linecap="round"/>
+                                
+                                <!-- Nariz y Hocico -->
+                                <ellipse cx="230" cy="166" rx="14" ry="10" fill="#2e3b2b"/>
+                                <path d="M 220 178 Q 230 188 240 178" fill="none" stroke="#2e3b2b" stroke-width="6" stroke-linecap="round"/>
+                                <!-- Lenguita Rosada afuera -->
+                                <path d="M 233 182 C 230 198 245 198 242 182 Z" fill="#e87a7a" stroke="#2e3b2b" stroke-width="4"/>
+
+                                <!-- Patitas Delanteras Abrazando el Cubo -->
+                                <ellipse cx="235" cy="222" rx="18" ry="14" fill="#ffffff" stroke="#2e3b2b" stroke-width="7"/>
+                                <ellipse cx="295" cy="218" rx="18" ry="14" fill="#ffffff" stroke="#2e3b2b" stroke-width="7"/>
+                                <!-- Líneas de garras -->
+                                <line x1="228" y1="220" x2="228" y2="228" stroke="#2e3b2b" stroke-width="4"/>
+                                <line x1="235" y1="222" x2="235" y2="230" stroke="#2e3b2b" stroke-width="4"/>
+                                <line x1="288" y1="216" x2="288" y2="224" stroke="#2e3b2b" stroke-width="4"/>
+                                <line x1="295" y1="218" x2="295" y2="226" stroke="#2e3b2b" stroke-width="4"/>
+
+                                <!-- Destellos de Alegría sobre la cabeza -->
+                                <path d="M 330 150 L 350 120" stroke="#5b6e56" stroke-width="9" stroke-linecap="round"/>
+                                <path d="M 350 170 L 380 150" stroke="#5b6e56" stroke-width="9" stroke-linecap="round"/>
+                            </g>
+
+                            <!-- TEXTO TIPOGRÁFICO 'Pet Cubé' Y ESLOGAN -->
+                            <!-- 'Pet Cubé' con hojita verde en la é -->
+                            <text x="245" y="410" text-anchor="middle" font-family="'Fredoka', 'Arial Black', sans-serif" font-weight="900" font-size="64" fill="#2e3b2b" letter-spacing="-1">Pet Cubé</text>
+                            
+                            <!-- Hoja en la é de Cubé -->
+                            <path d="M 358 360 C 375 345 385 360 370 372 C 358 375 352 368 358 360 Z" fill="#5b6e56"/>
+
+                            <!-- Eslogan 'Juntos en cada paseo.' -->
+                            <text x="250" y="448" text-anchor="middle" font-family="'Brush Script MT', 'Segoe Print', cursive, sans-serif" font-size="34" fill="#5b6e56" font-style="italic" font-weight="bold">Juntos en cada paseo.</text>
+                        </svg>
+                    </div>
+
+                    <div class="hidden sm:block">
+                        <span class="text-2xl font-black font-brand tracking-tight text-military-900 block leading-none">Pet Cubé</span>
+                        <span class="text-[11px] font-bold text-military-600 block mt-1 italic tracking-tight">Juntos en cada paseo.</span>
+                    </div>
+                </a>
+
+                <!-- Nav Desktop -->
+                <nav class="hidden md:flex items-center gap-8 text-sm font-semibold text-military-800">
+                    <a href="#inicio" class="hover:text-camel-600 transition-colors">Inicio</a>
+                    <a href="#funciones" class="hover:text-camel-600 transition-colors">Pet Cubé 4 en 1</a>
+                    <a href="#registro" class="hover:text-camel-600 transition-colors">Registro QR Mascotas</a>
+                    <a href="#tienda" class="hover:text-camel-600 transition-colors">Tienda</a>
+                </nav>
+
+                <!-- Actions -->
+                <div class="flex items-center gap-4">
+                    <button onclick="toggleCart()" class="relative p-2.5 text-military-800 hover:bg-military-100 rounded-xl transition-colors">
+                        <i class="fa-solid fa-basket-shopping text-xl"></i>
+                        <span id="cart-badge" class="absolute -top-1 -right-1 bg-camel-600 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center hidden">0</span>
+                    </button>
+
+                    <a href="#tienda" class="hidden sm:inline-flex items-center gap-2 bg-military-600 hover:bg-military-700 text-white px-5 py-2.5 rounded-xl font-bold shadow-md hover:shadow-lg transition-all text-sm">
+                        <i class="fa-solid fa-paw"></i>
+                        <span>Obtener mi Pet Cubé</span>
+                    </a>
+
+                    <button onclick="toggleMobileMenu()" class="md:hidden p-2 text-military-800 rounded-lg">
+                        <i id="mobile-menu-icon" class="fa-solid fa-bars text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-sand border-b border-military-200 px-4 pt-2 pb-6 space-y-3">
+            <a href="#inicio" onclick="toggleMobileMenu()" class="block py-2 text-military-900 font-semibold">Inicio</a>
+            <a href="#funciones" onclick="toggleMobileMenu()" class="block py-2 text-military-900 font-semibold">Pet Cubé 4 en 1</a>
+            <a href="#registro" onclick="toggleMobileMenu()" class="block py-2 text-military-900 font-semibold">Registro QR Mascotas</a>
+            <a href="#tienda" onclick="toggleMobileMenu()" class="block py-2 text-military-900 font-semibold">Tienda</a>
+        </div>
+    </header>
+
+    <!-- HERO SECTION -->
+    <section id="inicio" class="relative py-12 lg:py-16 overflow-hidden bg-gradient-to-b from-sand via-military-50/40 to-sand">
+        <div class="absolute inset-0 bg-pattern pointer-events-none"></div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="grid lg:grid-cols-12 gap-12 items-center">
+                
+                <!-- Hero Text -->
+                <div class="lg:col-span-6 space-y-6 text-center lg:text-left">
+                    <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-military-100 border border-military-200 text-military-800 text-xs sm:text-sm font-bold">
+                        <i class="fa-solid fa-cubes text-camel-600"></i>
+                        El accesorio definitivo 4 en 1 para paseos
+                    </div>
+
+                    <h1 class="text-4xl sm:text-5xl font-black font-brand text-military-900 tracking-tight leading-tight">
+                        Todo lo que necesitas para tu perrito en un solo <span class="text-military-600 underline decoration-camel-500 underline-offset-4">Pet Cubé</span>.
+                    </h1>
+
+                    <p class="text-base sm:text-lg text-gray-700 font-normal leading-relaxed">
+                        Lleva <strong class="text-military-900">toallitas húmedas, bolsas de heces, plato de agua plegable y galletas</strong> compactados en un cubo verde militar ultra práctico con mosquetón reforzado y registro QR de identificación inteligente.
+                    </p>
+
+                    <div class="pt-2 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+                        <a href="#tienda" class="inline-flex items-center justify-center gap-3 bg-military-600 hover:bg-military-700 text-white font-extrabold text-base px-8 py-4 rounded-2xl shadow-xl transition-all hover:-translate-y-0.5">
+                            <i class="fa-solid fa-cart-shopping"></i>
+                            Comprar mi Pet Cubé
+                        </a>
+                        <a href="#funciones" class="inline-flex items-center justify-center gap-2 bg-white hover:bg-cream text-military-800 border-2 border-military-200 font-bold text-base px-6 py-4 rounded-2xl shadow-sm transition-all">
+                            <i class="fa-solid fa-circle-info text-camel-600"></i>
+                            Conocer las 4 Funciones
+                        </a>
+                    </div>
+
+                    <div class="pt-4 flex items-center justify-center lg:justify-start gap-3">
+                        <span class="text-xs font-bold text-military-700 uppercase tracking-wide">Eslogan oficial:</span>
+                        <span class="text-sm font-brand font-bold text-camel-600 bg-camel-100 px-3 py-1 rounded-full border border-camel-200">
+                            "Juntos en cada paseo."
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Hero Graphic Representation of Real Product Image -->
+                <div class="lg:col-span-6 flex justify-center">
+                    <div class="relative w-full max-w-md">
+                        <div class="absolute -inset-3 bg-military-600/20 rounded-3xl blur-xl transform rotate-1"></div>
+                        
+                        <!-- Visual del Accesorio Pet Cubé basándonos exactamente en la foto adjunta -->
+                        <div class="relative bg-white p-6 rounded-3xl shadow-2xl border-2 border-military-200 text-center">
+                            
+                            <div class="bg-military-50 p-4 rounded-2xl border border-military-100 relative mb-4">
+                                <!-- Tag Flotante -->
+                                <span class="absolute top-3 right-3 bg-camel-600 text-white text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-widest shadow">
+                                    Diseño 4 en 1
+                                </span>
+
+                                <!-- ILUSTRACIÓN DETALLADA DEL PRODUCTO REAL -->
+                                <div class="w-full h-64 my-2 flex items-center justify-center relative">
+                                    
+                                    <!-- Enganche / Mosquetón superior -->
+                                    <div class="absolute -top-2 left-1/2 -translate-x-1/2 flex flex-col items-center">
+                                        <div class="w-6 h-8 border-4 border-gray-400 rounded-full flex items-center justify-center">
+                                            <div class="w-2 h-2 bg-gray-500 rounded-full"></div>
+                                        </div>
+                                        <div class="w-4 h-3 bg-military-600 rounded-t"></div>
+                                    </div>
+
+                                    <!-- CUBO PRINCIPAL (VERDE SAGE / MILITAR) -->
+                                    <div class="w-60 h-52 bg-military-500 rounded-2xl border-4 border-military-700 shadow-xl relative overflow-hidden flex flex-col justify-between p-3 mt-4">
+                                        
+                                        <!-- Tapa superior con marca grabada -->
+                                        <div class="w-full bg-military-600/90 border-b-2 border-military-700 p-2 rounded-xl flex items-center justify-between">
+                                            <span class="font-brand font-bold text-cream text-sm tracking-wider">Pet Cubé</span>
+                                            <div class="flex gap-1">
+                                                <i class="fa-solid fa-paw text-[10px] text-camel-200"></i>
+                                            </div>
+                                        </div>
+
+                                        <!-- Compartimentos internos expuestos (Igual a la foto del producto) -->
+                                        <div class="grid grid-cols-2 gap-2 h-32 my-1">
+                                            <!-- Izquierda: Rollo Bolsas Recojo -->
+                                            <div class="bg-military-700/40 rounded-xl p-2 border border-military-600 flex flex-col items-center justify-center relative">
+                                                <div class="w-10 h-14 bg-gray-900 rounded-lg border-2 border-gray-700 flex items-center justify-center shadow">
+                                                    <div class="w-3 h-3 rounded-full bg-military-500"></div>
+                                                </div>
+                                                <span class="text-[9px] font-bold text-cream mt-1">Bolsas Heces</span>
+                                            </div>
+
+                                            <!-- Derecha: Toallitas Húmedas -->
+                                            <div class="bg-military-700/40 rounded-xl p-2 border border-military-600 flex flex-col items-center justify-center">
+                                                <div class="w-12 h-12 bg-emerald-100 rounded-lg border border-emerald-300 flex items-center justify-center shadow">
+                                                    <i class="fa-solid fa-toilet-paper text-emerald-700 text-lg"></i>
+                                                </div>
+                                                <span class="text-[9px] font-bold text-cream mt-1">Toallitas</span>
+                                            </div>
+
+                                            <!-- Abajo Ancho: Plato de agua Plegable -->
+                                            <div class="col-span-2 bg-military-700/40 rounded-xl p-1.5 border border-military-600 flex items-center justify-between px-3">
+                                                <div class="flex items-center gap-2">
+                                                    <div class="w-16 h-6 bg-gray-300 rounded-full border-2 border-gray-400 flex items-center justify-center">
+                                                        <div class="w-12 h-3 bg-military-200 rounded-full"></div>
+                                                    </div>
+                                                    <span class="text-[10px] font-bold text-cream">Plato de Agua Plegable</span>
+                                                </div>
+                                                <i class="fa-solid fa-glass-water text-camel-200 text-xs"></i>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <h3 class="text-lg font-bold text-military-900 font-brand">Cubo Compacto Verde Militar Táctico</h3>
+                            <p class="text-xs text-gray-500 mt-1">Engánchalo fácilmente a la correa, arnés o pantalón durante el paseo.</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+    <!-- FOOTER CON LOGO OFICIAL ACTUALIZADO -->
+    <footer class="bg-military-900 text-white py-12 border-t-4 border-camel-600">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+                
+                <div class="md:col-span-2 space-y-4">
+                    <div class="flex items-center gap-4">
+                        <div class="w-16 h-16 bg-sand rounded-full p-1 flex items-center justify-center border-2 border-camel-500 shadow-md">
+                            <svg viewBox="0 0 500 500" class="w-full h-full">
+                                <circle cx="250" cy="250" r="236" fill="#f8f6f0" stroke="#2e3b2b" stroke-width="22"/>
+                                <rect x="225" y="215" width="135" height="110" rx="18" fill="#5b6e56" stroke="#2e3b2b" stroke-width="10"/>
+                                <rect x="235" y="235" width="105" height="65" rx="10" fill="#dedbd2" stroke="#2e3b2b" stroke-width="8"/>
+                                <ellipse cx="225" cy="165" rx="65" ry="58" fill="#ffffff" stroke="#2e3b2b" stroke-width="10"/>
+                                <path d="M 180 135 C 165 160 195 195 220 185 C 230 160 210 125 180 135 Z" fill="#b87d4b"/>
+                                <path d="M 175 145 C 130 130 110 180 135 205 C 160 220 185 180 175 145 Z" fill="#b87d4b" stroke="#2e3b2b" stroke-width="8"/>
+                                <ellipse cx="230" cy="166" rx="14" ry="10" fill="#2e3b2b"/>
+                                <text x="245" y="410" text-anchor="middle" font-family="'Fredoka', sans-serif" font-weight="900" font-size="64" fill="#2e3b2b">Pet Cubé</text>
+                            </svg>
+                        </div>
+                        <div>
+                            <span class="text-2xl font-black font-brand text-white block">Pet Cubé</span>
+                            <span class="text-sm font-brand text-camel-400 italic">"Juntos en cada paseo."</span>
+                        </div>
+                    </div>
+                    <p class="text-gray-400 text-xs max-w-sm leading-relaxed">
+                        El único accesorio 4 en 1 que integra toallitas húmedas, bolsas de recojo, plato de agua plegable y premios para perros, registrado con código QR inteligente.
+                    </p>
+                </div>
+
+                <!-- Función 2: Bolsas de Heces -->
+                <div class="p-6 rounded-3xl bg-sand border border-military-100 hover:border-military-500 transition-all hover:shadow-lg group">
+                    <div class="w-12 h-12 rounded-2xl bg-camel-600 text-white flex items-center justify-center text-xl mb-4 group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-box-tissue"></i>
+                    </div>
+                    <span class="text-xs font-bold text-camel-600 uppercase tracking-wider">Módulo 2</span>
+                    <h3 class="text-lg font-bold text-military-900 font-brand mt-1 mb-2">Bolsas para Recojo de Heces</h3>
+                    <p class="text-xs text-gray-600 leading-relaxed">
+                        Ranura dispensadora universal para rollos estándar de bolsas biodegradables. Tira y corta fácilmente con una sola mano.
+                    </p>
+                </div>
+
+                <!-- Función 3: Plato de Agua -->
+                <div class="p-6 rounded-3xl bg-sand border border-military-100 hover:border-military-500 transition-all hover:shadow-lg group">
+                    <div class="w-12 h-12 rounded-2xl bg-military-600 text-camel-400 flex items-center justify-center text-xl mb-4 group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-whiskey-glass"></i>
+                    </div>
+                    <span class="text-xs font-bold text-camel-600 uppercase tracking-wider">Módulo 3</span>
+                    <h3 class="text-lg font-bold text-military-900 font-brand mt-1 mb-2">Plato de Agua Plegable</h3>
+                    <p class="text-xs text-gray-600 leading-relaxed">
+                        Compartimento inferior diseñado para guardar el tazón de silicona colapsable e hidratar a tu mascota donde sea.
+                    </p>
+                </div>
+
+                <!-- Función 4: Galletas y Premios -->
+                <div class="p-6 rounded-3xl bg-sand border border-military-100 hover:border-military-500 transition-all hover:shadow-lg group">
+                    <div class="w-12 h-12 rounded-2xl bg-camel-600 text-white flex items-center justify-center text-xl mb-4 group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-cookie-bite"></i>
+                    </div>
+                    <span class="text-xs font-bold text-camel-600 uppercase tracking-wider">Módulo 4</span>
+                    <h3 class="text-lg font-bold text-military-900 font-brand mt-1 mb-2">Compartimento para Galletas</h3>
+                    <p class="text-xs text-gray-600 leading-relaxed">
+                        Sección superior abatible y hermética para guardar snacks, premios y croquetas para reforzar el entrenamiento positivo.
+                    </p>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- SECCIÓN REGISTRO DE MASCOTA Y QR -->
+    <section id="registro" class="py-16 bg-sand">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="bg-white rounded-3xl shadow-xl border border-military-100 overflow-hidden">
+                
+                <div class="bg-military-600 p-6 sm:p-8 text-white relative">
+                    <div class="absolute right-6 top-6 opacity-10 text-8xl text-white pointer-events-none">
+                        <i class="fa-solid fa-shield-dog"></i>
+                    </div>
+                    <span class="bg-camel-500/30 text-camel-200 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-widest inline-block mb-2">
+                        Sistema Integrado QR
+                    </span>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold font-brand">Registra tu Pet Cubé</h2>
+                    <p class="text-military-100 text-sm mt-1">Vincula el código ID impreso en tu cubo para crear la ficha digital de tu perro.</p>
+                </div>
+
+                <form id="pet-registration-form" onsubmit="handleRegistration(event)" class="p-6 sm:p-8 space-y-8">
+                    
+                    <!-- ID CUBE -->
+                    <div class="bg-military-50 p-4 sm:p-5 rounded-2xl border border-military-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-military-600 text-white flex items-center justify-center font-bold text-lg">
+                                <i class="fa-solid fa-qrcode"></i>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-military-900 uppercase">Código del Pet Cubé (ID Impreso)</label>
+                                <span class="text-xs text-gray-500">Ingresa el código que viene grabado en la tapa de tu cubo</span>
+                            </div>
+                        </div>
+                        <div class="w-full sm:w-auto">
+                            <input type="text" id="cube-id" required value="CUBE-8829-MAX" class="w-full sm:w-48 px-4 py-2.5 bg-white border border-military-300 rounded-xl font-mono text-sm font-bold text-military-900 focus:outline-none focus:ring-2 focus:ring-military-600 uppercase">
+                        </div>
+                    </div>
+
+                    <!-- DATOS MASCOTA -->
+                    <div>
+                        <h3 class="text-lg font-bold text-military-900 border-b border-gray-100 pb-2 mb-4 flex items-center gap-2 font-brand">
+                            <i class="fa-solid fa-dog text-camel-600"></i>
+                            1. Datos del Perro
+                        </h3>
+
+                        <div class="grid sm:grid-cols-2 gap-4 sm:gap-6">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Nombre de la Mascota *</label>
+                                <input type="text" id="pet-name" required placeholder="Ej: Max, Tobby, Maya" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-military-600 text-sm">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Raza *</label>
+                                <input type="text" id="pet-breed" required placeholder="Ej: Mestizo, Beagle, Golden" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-military-600 text-sm">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Edad</label>
+                                <input type="text" id="pet-age" placeholder="Ej: 2 años" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-military-600 text-sm">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Género *</label>
+                                <select id="pet-gender" required class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-military-600 text-sm bg-white">
+                                    <option value="Macho">Macho ♂</option>
+                                    <option value="Hembra">Hembra ♀</option>
+                                </select>
+                            </div>
+
+                            <div class="sm:col-span-2">
+                                <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Foto de la Mascota (URL Opcional)</label>
+                                <input type="url" id="pet-photo" placeholder="https://..." class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-military-600 text-sm">
+                            </div>
+
+                            <div class="sm:col-span-2">
+                                <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Notas Médicas o Alergias</label>
+                                <textarea id="pet-notes" rows="2" placeholder="Ej: Alérgico a ciertos alimentos, requiere medicación diaria..." class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-military-600 text-sm"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- DATOS PROPIETARIO -->
+                    <div>
+                        <h3 class="text-lg font-bold text-military-900 border-b border-gray-100 pb-2 mb-4 flex items-center gap-2 font-brand">
+                            <i class="fa-solid fa-user-gear text-military-600"></i>
+                            2. Datos del Propietario
+                        </h3>
+
+                        <div class="grid sm:grid-cols-2 gap-4 sm:gap-6">
+                            <div class="sm:col-span-2">
+                                <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Nombre Completo *</label>
+                                <input type="text" id="owner-name" required placeholder="Ej: María Ramírez" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-military-600 text-sm">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Teléfono WhatsApp *</label>
+                                <input type="tel" id="owner-phone" required placeholder="Ej: +51 987654321" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-military-600 text-sm">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Correo Electrónico *</label>
+                                <input type="email" id="owner-email" required placeholder="correo@ejemplo.com" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-military-600 text-sm">
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full py-4 bg-military-600 hover:bg-military-700 text-white font-extrabold text-base rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2 font-brand">
+                        <i class="fa-solid fa-floppy-disk"></i>
+                        Guardar Registro de Mascota
+                    </button>
+                </form>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- TIENDA DE PRODUCTOS PET CUBE -->
+    <section id="tienda" class="py-16 bg-white border-t border-military-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <div class="text-center max-w-3xl mx-auto mb-12">
+                <span class="text-camel-600 font-bold uppercase tracking-wider text-xs">Catálogo Oficial</span>
+                <h2 class="text-3xl sm:text-4xl font-extrabold font-brand text-military-900 mt-1">Consigue tu Pet Cubé Original</h2>
+                <p class="text-gray-600 mt-2 text-sm">Elige el color o pack que mejor se adapte al estilo de tu perro.</p>
+            </div>
+
+            <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                
+                <!-- Producto 1: Pet Cube Verde Militar -->
+                <div class="bg-sand rounded-3xl p-5 border border-military-100 flex flex-col justify-between hover:shadow-xl transition-all group">
+                    <div>
+                        <div class="relative overflow-hidden rounded-2xl bg-white p-6 mb-4 text-center border border-military-100">
+                            <span class="absolute top-3 right-3 bg-military-600 text-white text-[10px] font-bold px-2.5 py-1 rounded-full uppercase">Edición Oficial</span>
+                            
+                            <!-- Icono de Producto Verde -->
+                            <div class="w-24 h-24 mx-auto bg-military-600 rounded-2xl flex items-center justify-center text-white shadow-lg my-4 group-hover:scale-105 transition-transform">
+                                <i class="fa-solid fa-cubes text-camel-400 text-4xl"></i>
+                            </div>
+                        </div>
+                        <h3 class="text-lg font-bold text-military-900 font-brand">Pet Cubé Verde Militar (Sage)</h3>
+                        <p class="text-xs text-gray-500 mt-1">Incluye el cubo 4 en 1 completo + plato de agua plegable + mosquetón metálico + código QR de registro.</p>
+                    </div>
+                    <div class="mt-6 flex items-center justify-between">
+                        <div>
+                            <span class="text-xs text-gray-400 block">Precio</span>
+                            <span class="text-xl font-black text-military-900">$24.99 USD</span>
+                        </div>
+                        <button onclick="addToCart('Pet Cubé Verde Militar', 24.99)" class="px-4 py-2.5 bg-military-600 hover:bg-military-700 text-white font-bold rounded-xl text-xs shadow transition-colors flex items-center gap-2">
+                            <i class="fa-solid fa-cart-plus"></i> Añadir
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Producto 2: Pet Cube Camel Arena -->
+                <div class="bg-sand rounded-3xl p-5 border border-military-100 flex flex-col justify-between hover:shadow-xl transition-all group">
+                    <div>
+                        <div class="relative overflow-hidden rounded-2xl bg-white p-6 mb-4 text-center border border-military-100">
+                            <span class="absolute top-3 right-3 bg-camel-600 text-white text-[10px] font-bold px-2.5 py-1 rounded-full uppercase">Color Camel</span>
+                            
+                            <div class="w-24 h-24 mx-auto bg-camel-600 rounded-2xl flex items-center justify-center text-white shadow-lg my-4 group-hover:scale-105 transition-transform">
+                                <i class="fa-solid fa-cubes text-sand text-4xl"></i>
+                            </div>
+                        </div>
+                        <h3 class="text-lg font-bold text-military-900 font-brand">Pet Cubé Edición Sahara Camel</h3>
+                        <p class="text-xs text-gray-500 mt-1">Mismo diseño multifuncional 4 en 1 con un acabado cálido en color arena camel.</p>
+                    </div>
+                    <div class="mt-6 flex items-center justify-between">
+                        <div>
+                            <span class="text-xs text-gray-400 block">Precio</span>
+                            <span class="text-xl font-black text-military-900">$24.99 USD</span>
+                        </div>
+                        <button onclick="addToCart('Pet Cubé Edición Sahara Camel', 24.99)" class="px-4 py-2.5 bg-military-600 hover:bg-military-700 text-white font-bold rounded-xl text-xs shadow transition-colors flex items-center gap-2">
+                            <i class="fa-solid fa-cart-plus"></i> Añadir
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER CON LOGO OFICIAL -->
+    <footer class="bg-military-900 text-white py-12 border-t-4 border-camel-600">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+                
+                <div class="md:col-span-2 space-y-3">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 bg-cream rounded-full p-1 flex items-center justify-center border border-military-600">
+                            <svg viewBox="0 0 200 200" class="w-full h-full">
+                                <circle cx="100" cy="100" r="95" fill="#f8f6f0" stroke="#354238" stroke-width="8"/>
+                                <circle cx="100" cy="85" r="32" fill="#ffffff" stroke="#354238" stroke-width="4"/>
+                                <rect x="70" y="105" width="60" height="48" rx="8" fill="#58705c" stroke="#354238" stroke-width="5"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <span class="text-2xl font-black font-brand text-white">Pet Cubé</span>
+                            <span class="block text-xs text-camel-400 font-brand italic">Juntos en cada paseo.</span>
+                        </div>
+                    </div>
+                    <p class="text-gray-400 text-xs max-w-sm leading-relaxed">
+                        El accesorio multifuncional 4 en 1 que simplifica las caminatas y la seguridad de tu mejor amigo de cuatro patas.
+                    </p>
+                </div>
+
+                <div>
+                    <h4 class="text-xs font-bold uppercase text-camel-500 tracking-wider mb-3">Secciones</h4>
+                    <ul class="space-y-2 text-xs text-gray-300">
+                        <li><a href="#inicio" class="hover:text-camel-400">Inicio</a></li>
+                        <li><a href="#funciones" class="hover:text-camel-400">Las 4 Funciones</a></li>
+                        <li><a href="#registro" class="hover:text-camel-400">Registrar Pet Cubé</a></li>
+                        <li><a href="#tienda" class="hover:text-camel-400">Tienda</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="text-xs font-bold uppercase text-camel-500 tracking-wider mb-3">Contacto</h4>
+                    <p class="text-xs text-gray-300 mb-1"><i class="fa-solid fa-envelope text-camel-500 mr-2"></i> ventas@petcube.com</p>
+                    <p class="text-xs text-gray-300"><i class="fa-solid fa-phone text-camel-500 mr-2"></i> +51 987 654 321</p>
+                </div>
+            </div>
+
+            <div class="pt-6 border-t border-military-800 text-center text-xs text-gray-500">
+                &copy; 2026 Pet Cubé. Todos los derechos reservados. "Juntos en cada paseo."
+            </div>
+        </div>
+    </footer>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        let cart = [];
+
+        window.onload = function() {
+            loadCartFromStorage();
+            updateCartUI();
+        };
+
+        function openModal(id) {
+            document.getElementById('modal-backdrop').classList.remove('hidden');
+            document.getElementById(id).classList.remove('hidden');
+        }
+
+        function closeModal(id) {
+            document.getElementById('modal-backdrop').classList.add('hidden');
+            document.getElementById(id).classList.add('hidden');
+        }
+
+        function toggleMobileMenu() {
+            document.getElementById('mobile-menu').classList.toggle('hidden');
+        }
+
+        function handleRegistration(e) {
+            e.preventDefault();
+            const defaultPhoto = "https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&q=80&w=600";
+            
+            const petData = {
+                cubeId: document.getElementById('cube-id').value.trim(),
+                petName: document.getElementById('pet-name').value.trim(),
+                breed: document.getElementById('pet-breed').value.trim(),
+                age: document.getElementById('pet-age').value.trim() || '2 años',
+                gender: document.getElementById('pet-gender').value,
+                photo: document.getElementById('pet-photo').value.trim() || defaultPhoto,
+                notes: document.getElementById('pet-notes').value.trim() || 'Sin alergias registradas',
+                ownerName: document.getElementById('owner-name').value.trim(),
+                ownerPhone: document.getElementById('owner-phone').value.trim(),
+                ownerEmail: document.getElementById('owner-email').value.trim()
+            };
+
+            showPetProfileModal(petData);
+        }
+
+        function showPetProfileModal(pet) {
+            const content = document.getElementById('profile-modal-content');
+            const cleanPhone = pet.ownerPhone.replace(/[^0-9]/g, '');
+
+            content.innerHTML = `
+                <div class="bg-sand p-6 rounded-2xl border border-military-200 relative">
+                    <div class="flex items-center gap-4 mb-4">
+                        <img src="${pet.photo}" onerror="this.src='https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&q=80&w=600'" class="w-20 h-20 rounded-2xl object-cover border-2 border-military-600">
+                        <div>
+                            <span class="text-[10px] font-bold text-camel-700 bg-camel-100 px-2 py-0.5 rounded-full uppercase">${pet.cubeId}</span>
+                            <h2 class="text-2xl font-black font-brand text-military-900">${pet.petName}</h2>
+                            <p class="text-xs text-gray-600 font-medium">${pet.breed} • ${pet.age} • ${pet.gender}</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-3 rounded-xl border border-gray-200 text-xs text-gray-600 mb-4">
+                        <strong>Notas Médicas:</strong> ${pet.notes}
+                    </div>
+
+                    <div class="space-y-2">
+                        <a href="https://wa.me/${cleanPhone}?text=Hola%20${encodeURIComponent(pet.ownerName)},%20he%20encontrado%20a%20tu%20mascota%20${encodeURIComponent(pet.petName)}." target="_blank" class="w-full py-3 bg-emerald-600 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-2">
+                            <i class="fa-brands fa-whatsapp text-sm"></i> Contactar al dueño por WhatsApp
+                        </a>
+                    </div>
+                </div>
+            `;
+
+            openModal('profile-modal');
+        }
+
+        function toggleCart() {
+            const drawer = document.getElementById('cart-drawer');
+            const backdrop = document.getElementById('modal-backdrop');
+            drawer.classList.toggle('translate-x-full');
+            backdrop.classList.toggle('hidden');
+        }
+
+        function addToCart(title, price) {
+            const existing = cart.find(item => item.title === title);
+            if (existing) {
+                existing.quantity += 1;
+            } else {
+                cart.push({ title, price, quantity: 1 });
+            }
+            saveCartToStorage();
+            updateCartUI();
+            
+            const drawer = document.getElementById('cart-drawer');
+            if (drawer.classList.contains('translate-x-full')) {
+                toggleCart();
+            }
+        }
+
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            saveCartToStorage();
+            updateCartUI();
+        }
+
+        function updateCartUI() {
+            const container = document.getElementById('cart-items');
+            const badge = document.getElementById('cart-badge');
+            const totalEl = document.getElementById('cart-total');
+
+            const totalItems = cart.reduce((acc, curr) => acc + curr.quantity, 0);
+            const totalPrice = cart.reduce((acc, curr) => acc + (curr.price * curr.quantity), 0);
+
+            if (totalItems > 0) {
+                badge.textContent = totalItems;
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
+
+            totalEl.textContent = `$${totalPrice.toFixed(2)} USD`;
+
+            if (cart.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-12 text-gray-400">
+                        <i class="fa-solid fa-box-open text-5xl mb-3 text-camel-200"></i>
+                        <p class="text-lg font-medium">Tu carrito está vacío</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = cart.map((item, index) => `
+                <div class="pt-3 flex justify-between items-center">
+                    <div>
+                        <h4 class="text-xs font-bold text-military-900">${item.title}</h4>
+                        <span class="text-[11px] text-gray-500">$${item.price.toFixed(2)} x ${item.quantity}</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span class="text-xs font-bold text-military-900">$${(item.price * item.quantity).toFixed(2)}</span>
+                        <button onclick="removeFromCart(${index})" class="text-gray-400 hover:text-red-500">
+                            <i class="fa-solid fa-trash-can text-xs"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function checkoutCart() {
+            if (cart.length === 0) return;
+            alert('¡Gracias por tu pedido en Pet Cubé! Redirigiendo al pago...');
+            cart = [];
+            saveCartToStorage();
+            updateCartUI();
+            toggleCart();
+        }
+
+        function saveCartToStorage() {
+            try { localStorage.setItem('pet_cube_cart', JSON.stringify(cart)); } catch(e){}
+        }
+
+        function loadCartFromStorage() {
+            try {
+                const saved = localStorage.getItem('pet_cube_cart');
+                if (saved) cart = JSON.parse(saved);
+            } catch(e){}
+        }
+    </script>
+</body>
+</html>
